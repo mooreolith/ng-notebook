@@ -98,7 +98,7 @@ export class NotebookService {
       })
     });
 
-    localStorage.setItem('ng-notebook:last-title', title);
+    localStorage.setItem('ng-notebook:last-ls', title);
     localStorage.setItem(this.instance.metadata.title, str);
   }
 }
