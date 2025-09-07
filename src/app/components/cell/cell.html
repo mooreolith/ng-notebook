@@ -41,13 +41,15 @@
           (dblclick)="this.isRendered.set(false)">
         </rendered-markdown>
       } @else {
-        <textarea #textarea
-          [tabindex]="4"
-          appAutoResize
+        <code-editor 
           class="bg-slate-100 form-control font-mono focus:outline-none w-[82ch] min-h-[5ch] resize-y"
           [(ngModel)]="source"
           name="source"
-          (keyup.code.control.enter)="run()"></textarea>
+          indentWithTab="true" 
+          [languages]="languages"
+          [language]="language()"
+          [extensions]="editorExtensions"
+          />
       }
     </div>
 

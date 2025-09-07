@@ -72,9 +72,11 @@ export class NotebookService {
   }
 
   public writeNotebook(): void {
+    const title = this.instance.metadata.title ?? '';
+
     const str = JSON.stringify({
       metadata: {
-        title: this.instance.metadata.title ?? '',
+        title,
         kernel_info: { name: "javascript" },
         language_info: { name: "javascript", version: "2022", codemirror_mode: "javascript" }
       },
@@ -96,6 +98,7 @@ export class NotebookService {
       })
     });
 
+    localStorage.setItem('ng-notebook:last-title', title);
     localStorage.setItem(this.instance.metadata.title, str);
   }
 }

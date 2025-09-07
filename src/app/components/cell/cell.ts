@@ -1,19 +1,22 @@
-import { Component, model, effect, output, computed, 
-  ViewChild, ElementRef, AfterViewInit, 
-  Type} from '@angular/core';
+import { Component, model, effect, output, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import * as ts from "typescript";
 import { RenderedMarkdownComponent } from '../rendered-markdown/rendered-markdown';
-import { AutoResize } from '../../directives/auto-resize';
 import { OutputInterface } from '../../models/cell.model';
+import { CodeEditor } from '@acrodata/code-editor';
+import { javascript } from '@codemirror/lang-javascript';
+import { markdown } from '@codemirror/lang-markdown';
+import { Prec } from '@codemirror/state';
+import { keymap } from '@codemirror/view';
+import { basicSetup } from 'codemirror';
 
 @Component({
   selector: 'app-cell',
-  imports: [FormsModule, RenderedMarkdownComponent, AutoResize],
+  imports: [FormsModule, RenderedMarkdownComponent, CodeEditor],
   templateUrl: './cell.html',
   styleUrl: './cell.css',
 })
-export class CellComponent implements AfterViewInit {
+export class CellComponent {
   public cell_type = model<string>('javascript');
   public source = model<string>('');
   public outputs = model<OutputInterface[]>([]);
@@ -30,11 +33,39 @@ export class CellComponent implements AfterViewInit {
   public addBelow = output<CellComponent>();
   public remove = output<CellComponent>();
 
-  @ViewChild('textarea') textarea!: ElementRef<HTMLTextAreaElement>;
+  public languages: any[] = [
+    {
+      name: 'javascript',
+      alias: ['js'],
+      load: async () => javascript()
+    }, {
+      name: 'typescript',
+      alias: ['ts'],
+      load: async () => javascript({ typescript: true })
+    }, {
+      name: 'markdown',
+      alias: ['md'],
+      load: async () => markdown()
+    }
+  ];
 
-  ngAfterViewInit(): void {
-    this.textarea.nativeElement.focus();
-  }
+  language = computed(() => {
+    const cellType = this.cell_type();
+    return this.languages[this.languages.findIndex(l => l.name === cellType)].name;
+  });
+
+  editorExtensions = [
+    basicSetup,
+    Prec.highest(
+      keymap.of([{
+        key: 'Mod-Enter',
+        run: (view) => {
+          this.run();
+          return true;
+        }
+      }])
+    )
+  ]
 
   constructor(){
     effect(() => {
@@ -51,7 +82,7 @@ export class CellComponent implements AfterViewInit {
     })
   }
 
-  public run(): void {
+  public run(): Boolean {
     switch(this.cell_type()){
       case 'markdown':
         this.runMD();
@@ -80,6 +111,8 @@ export class CellComponent implements AfterViewInit {
         this.execution_count.update(c => c + 1);
         break;
     }
+
+    return true;
   }
 
   public clear(): void {

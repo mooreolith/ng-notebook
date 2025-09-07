@@ -46,7 +46,8 @@ export class NotebookComponent {
   }
 
   onLoad(){
-    const title = prompt('Title');
+    const last = localStorage.getItem('ng-notebook:last-title') ?? '';
+    const title = prompt('Title', last);
     if(!title) return;
 
     this.notebookService.readNotebook(title);
