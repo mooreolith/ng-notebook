@@ -69,6 +69,13 @@ export class NotebookService {
         }
 
         cell.source = c.source;
+        cell.outputs = c.outputs.map((o: any) => {
+          return {
+            output_type: o.output_type,
+            name: o.name,
+            text: o.text
+          }
+        });
 
         return cell;
       })
@@ -97,6 +104,7 @@ export class NotebookService {
       }
 
       cell.source = c.source;
+      cell.outputs = c.outputs;
 
       return cell;
     });
