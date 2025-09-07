@@ -1,12 +1,15 @@
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { CellModel } from '../models/cell.model';
 import { NotebookModel } from "../models/notebook.model";
+import { StorageService } from './storage.service';
+
 
 @Injectable({
   providedIn: "root"
 })
 export class NotebookService {
   instance: NotebookModel = new NotebookModel();
+  storage: StorageService = inject(StorageService);
 
   constructor(){
     this.instance = new NotebookModel();
@@ -44,34 +47,7 @@ export class NotebookService {
     this.instance.cells.splice(index, 1);
   }
 
-  public readNotebook(title: string): NotebookModel {
-    const str = localStorage.getItem(title) ?? '';
-    const obj = JSON.parse(str);
-    this.instance.metadata.title = obj.metadata.title ?? 'Untitled Notebook';
-    this.instance.cells = obj.cells.map((c: CellModel) => {
-      let cell = new CellModel();
-
-      switch(c.cell_type){
-        case 'markdown':
-          cell.cell_type = "markdown"
-          break;
-
-        case 'code':
-          cell.cell_type = c.metadata.language; 
-          cell.execution_count = c.execution_count;
-          cell.outputs = c.outputs;
-          break;
-      }
-
-      cell.source = c.source;
-
-      return cell;
-    });
-
-    return this.instance;
-  }
-
-  public writeNotebook(): void {
+  public writeNotebook(method: string): void {
     const title = this.instance.metadata.title ?? '';
 
     const str = JSON.stringify({
@@ -98,7 +74,33 @@ export class NotebookService {
       })
     });
 
-    localStorage.setItem('ng-notebook:last-ls', title);
-    localStorage.setItem(this.instance.metadata.title, str);
+    this.storage.store(method, title, str);
+  }
+
+  public async readNotebook(method: string): Promise<NotebookModel> {
+    const str = await this.storage.load(method)
+    const obj = JSON.parse(str);
+    this.instance.metadata.title = obj.metadata.title ?? 'Untitled Notebook';
+    this.instance.cells = obj.cells.map((c: CellModel) => {
+      let cell = new CellModel();
+
+      switch(c.cell_type){
+        case 'markdown':
+          cell.cell_type = "markdown"
+          break;
+
+        case 'code':
+          cell.cell_type = c.metadata.language; 
+          cell.execution_count = c.execution_count;
+          cell.outputs = c.outputs;
+          break;
+      }
+
+      cell.source = c.source;
+
+      return cell;
+    });
+
+    return this.instance;
   }
 }

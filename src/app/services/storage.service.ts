@@ -3,14 +3,26 @@ import { Injectable } from "@angular/core";
 @Injectable({
   providedIn: "root"
 })
-export class NotebookService {
-  store(method: string, title: string, json: string){
+export class StorageService {
+  public store(method: string, title: string, json: string): void{
+    if(!title){
+      let pre = localStorage.getItem('ng-notebook:last-title') ?? '';
+      title = prompt("Notebook Title", pre) ?? '';
+      if(!title) return;
+      localStorage.setItem('ng-notebook:last-title', title);
+    }
     const filename = this.filename(title);
 
     switch(method){
       case 'localStorage':
-        localStorage.setItem('ng-notebook:last-ls', filename);
-        localStorage.setItem(filename, json);
+        try{
+          localStorage.setItem('ng-notebook:last-title', title);
+          localStorage.setItem(filename, json);
+        }catch(e: any){
+          alert(`localStorage Error! ${e.stack}`);
+        }
+
+        alert(`${filename} successfully stored in browser's localStorage`);
         break;
 
       case 'file':
@@ -42,19 +54,34 @@ export class NotebookService {
           if(!response.ok){
             alert(`HTTP Error! Status: ${response.status}`)
             throw new Error(`HTTP Error! Status: ${response.status} ${response.statusText}`);
+          }else{
+            alert(`${filename} successfully stored at ${postURL}`)
           }
         })
         break;
     }
   }
 
-  async load(method: string, title: string): Promise<string> {
+  public async load(method: string): Promise<string> {
+    let filename: string;
+    let title: string = '';
+
+    if(method !== 'file'){
+      let pre = localStorage.getItem('ng-notebook:last-title') ?? '';
+      title = prompt("Notebook Title", pre) ?? '';
+      if(!title) return '';
+      localStorage.setItem('ng-notebook:last-title', title);
+    }
+    filename = this.filename(title);
     let json = '';
-    const filename = this.filename(title);
 
     switch(method){
       case 'localStorage':
-        json = localStorage.getItem(filename) ?? '';
+        try{
+          json = localStorage.getItem(filename) ?? '';
+        }catch(e: any){
+          alert(`localStorage Error! Unable to open ${title}`)
+        }
         break;
       
       case 'file':
@@ -63,8 +90,8 @@ export class NotebookService {
           input = document.createElement('input');
           input.type = 'file';
           input.setAttribute('style', 'display: none;');
-          document.appendChild(input)
-          input.addEventListener('change', (ie) => {
+          document.body.appendChild(input)
+          input.addEventListener('change', () => {
             const reader = new FileReader();
             reader.onload = () => {
               resolve(reader.result as string);

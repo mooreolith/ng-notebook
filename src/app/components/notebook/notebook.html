@@ -1,11 +1,10 @@
 <div class="my-[25px] w-full min-w-[80ch] min-h-[min-content]">
   <div class="min-w-[80ch] h-full pe-[20px] pt-[25px] border-1 border-l-0 ps-[75px] bg-position-[left_center_-20px] w-[min-content] mx-auto bg-[url('/spiral-small.png')] bg-size-[60px_28px] bg-repeat-y">
-    <input [tabindex]="0" [(ngModel)]="notebook().metadata.title" class="w-100 text-5x1 outline-none border-b border-black" type="text" />
+    <input type="text" [(ngModel)]="notebook().metadata.title" class="w-100 text-5x1 outline-none border-b border-black" />
     
     <div>
       @for (cell of notebook().cells; track cell.id) {
         <app-cell 
-          [tabindex]="1"
           [(id)]="cell.id"
           [(cell_type)]="cell.cell_type"
           [(source)]="cell.source"
@@ -20,27 +19,37 @@
 
     <div class="py-[10px]">
       <button 
-        [tabIndex]="2"
         class="me-[2ch] ml-auto bg-white text-black hover:bg-black hover:text-white" 
         (click)="onRunAll()">Run All</button>
       <button
-        [tabIndex]="3"
         class="me-[2ch] ml-auto bg-white text-black hover:bg-black hover:text-white" 
         (click)="onAdd()">Add Cell</button>
-      
       <button
-        [tabIndex]="4"
         class="me-[2ch] ml-auto bg-white text-black hover:bg-black hover:text-white" 
         (click)="onClearAll()">Clear All</button>
+      
+      <label class="font-bold ps-[3ch] pe-[1ch]">Open from: </label>
+      <button
+        class="me-[1ch] ml-auto bg-white text-black hover:bg-black hover:text-white" 
+        (click)="onLoad('browser')">Browser</button>
+      <button
+        class="me-[1ch] ml-auto bg-white text-black hover:bg-black hover:text-white" 
+        (click)="onLoad('file')">File</button>
+      <button
+        class="me-[1ch] ml-auto bg-white text-black hover:bg-black hover:text-white" 
+        (click)="onLoad('url')">URL</button>
 
+      <label class="font-bold ps-[3ch] pe-[1ch]">Save to: </label>
       <button
-        [tabIndex]="5"
-        class="me-[2ch] ml-auto bg-white text-black hover:bg-black hover:text-white" 
-        (click)="onLoad()">Load Notebook</button>
+        class="me-[1ch] ml-auto bg-white text-black hover:bg-black hover:text-white" 
+        (click)="onStore('browser')">Browser</button>
       <button
-        [tabIndex]="6"
-        class="me-[2ch] ml-auto bg-white text-black hover:bg-black hover:text-white" 
-        (click)="onStore()">Store Notebook</button>
+        class="me-[1ch] ml-auto bg-white text-black hover:bg-black hover:text-white" 
+        (click)="onStore('file')">File</button>
+      <button
+        class="me-[1ch] ml-auto bg-white text-black hover:bg-black hover:text-white" 
+        (click)="onStore('url')">URL</button>
+
     </div>
   </div>
 </div>
