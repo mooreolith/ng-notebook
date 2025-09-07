@@ -1,0 +1,81 @@
+<div class="w-[min-content] py-[10px]">
+  <form>
+    <div class="py-[10px] flex w-[80ch]">
+      <input 
+        [tabindex]="0"
+        class="form-control" 
+        type="radio" 
+        value="markdown" 
+        [(ngModel)]="cell_type" 
+        name="cell_type" />
+      <label class="mx-[1ch]">markdown</label>
+      
+      <input 
+        [tabindex]="1"
+        class="form-control ms-[1ch]" 
+        type="radio" 
+        value="javascript" 
+        [(ngModel)]="cell_type" 
+        name="cell_type" />
+      <label class="mx-[1ch]">javascript</label>
+      
+      <input 
+        [tabindex]="2"
+        class="form-control ms-[1ch]" 
+        type="radio" 
+        value="typescript" 
+        [(ngModel)]="cell_type" 
+        name="cell_type" />
+      <label class="mx-[1ch]">typescript</label>
+      
+      <button 
+        [tabindex]="8"
+        class="ml-auto bg-white text-black hover:bg-black hover:text-white" 
+        (click)="addAbove.emit(this)">Add Above</button>
+    </div>
+
+    <div class="w-[80ch] min-h-[20]">
+      @if (isRendered()) {
+        <rendered-markdown
+          [(source)]="source"
+          (dblclick)="this.isRendered.set(false)">
+        </rendered-markdown>
+      } @else {
+        <textarea #textarea
+          [tabindex]="4"
+          appAutoResize
+          class="bg-slate-100 form-control font-mono focus:outline-none w-[82ch] min-h-[5ch] resize-y"
+          [(ngModel)]="source"
+          name="source"
+          (keyup.code.control.enter)="run()"></textarea>
+      }
+    </div>
+
+    <div class="py-[10px] flex">
+      <button
+        [tabindex]="5"
+        class="me-[2ch] bg-white text-black hover:bg-black hover:text-white"
+        (click)="run()">Run</button>
+      <button
+        [tabindex]="6"
+        class="me-[2ch] bg-white text-black hover:bg-black hover:text-white"
+        (click)="clear()">Clear</button>
+
+      <button 
+        [tabindex]="7"
+        class="me-[2ch] bg-white text-black hover:bg-black hover:text-white"
+        (click)="remove.emit(this)">Delete</button>
+
+      <button 
+        [tabindex]="9"
+        class="ml-auto bg-white text-black hover:bg-black hover:text-white" 
+        (click)="addBelow.emit(this)">Add Below</button>
+    </div>
+
+    <div>
+      @for (output of outputs(); track $index) {
+        <p [style.color]="output.name === 'stderr' ? 'red' : 'black'">{{output.text}}</p>
+      }
+    </div>
+  </form>
+</div>
