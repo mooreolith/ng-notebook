@@ -26,7 +26,7 @@ export class NotebookService {
 
   addAbove(id: string){
     const index = this.instance.cells.findIndex(c => c.id === id);
-    this.instance.cells.splice(index > 0 ? index - 1 : 0, 0, new CellModel());
+    this.instance.cells.splice(index > 0 ? index : 0, 0, new CellModel());
   }
 
   addBelow(id: string){
