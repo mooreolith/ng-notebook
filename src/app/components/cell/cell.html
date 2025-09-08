@@ -46,6 +46,7 @@
           [(ngModel)]="source"
           name="source"
           indentWithTab="true" 
+          [lineWrapping]="cell_type() === 'markdown'"
           [languages]="languages"
           [language]="language()"
           [extensions]="editorExtensions"
