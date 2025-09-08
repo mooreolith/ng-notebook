@@ -66,7 +66,7 @@ export class StorageService {
     let filename: string;
     let title: string = '';
 
-    if(method !== 'file'){
+    if(method === 'localStorage'){
       let pre = localStorage.getItem('ng-notebook:last-title') ?? '';
       title = prompt("Notebook Title", pre) ?? '';
       if(!title) return '';
